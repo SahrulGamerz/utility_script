@@ -2,10 +2,10 @@
 
 VER="0.0.1"
 DESC="This script can be used with linuxserver/wireguard images."
-IPS_USED=./config/ips.txt
-CONF_DIR=./config/clients
-SERVER_CONF_DIR=./config/server
-WG_CONF=./config/wg0.conf
+IPS_USED=${IPS_USED:-./config/ips.txt} # If env not set use default
+CONF_DIR=${CONF_DIR:-./config/clients} # If env not set use default
+SERVER_CONF_DIR=${SERVER_CONF_DIR:-./config/server} # If env not set use default
+WG_CONF=${WG_CONF:-./config/wg0.conf} # If env not set use default
 INTERFACE=$(echo "$INTERNAL_SUBNET" | awk 'BEGIN{FS=OFS="."} NF--')
 
 if [[ $INTERFACE = "" ]]; then
