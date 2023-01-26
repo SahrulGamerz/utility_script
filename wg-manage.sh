@@ -37,13 +37,17 @@ Help()
    echo "$DESC"
    echo "Available Command in WireGuard Client Manager."
    echo
-   echo "Syntax: wg-manage [-h|v|a <client_name>|r <client_name>|g <client_name>|j <client_name>]"
+   echo "Syntax: wg-manage [-h|v|j|l|a <client_name>|r <client_name>|g <client_name>]"
    echo "Example: wg-manage -a MyClient"
+   echo "Example: wg-manage -r MyClient"
+   echo "Example: wg-manage -jg MyClient"
+   echo "Example: wg-manage -jl"
    echo "Options:"
    echo "a     Add client."
    echo "r     Remove client."
    echo "g     Get client."
-   echo "j     Get client in JSON."
+   echo "l     Get client list."
+   echo "j     Get output in JSON format. Only applied to -g -l"
    echo "h     Print this Help."
    echo "v     Print software version and exit."
    echo
@@ -201,7 +205,11 @@ GetClient()
 		exit
 	fi
 	
-	cat $CLIENT_DIR/${CLIENT_NAME}.conf
+	if [[ $FORMAT = "JSON" ]]; then
+		GetClientJSON
+	else
+		cat $CLIENT_DIR/${CLIENT_NAME}.conf
+	fi
 }
 
 GetClientJSON()
@@ -225,7 +233,37 @@ GetClientJSON()
 	printf '{ "wireguard": { "client_name": "%s", "interface": { "address": "%s", "private_key": "%s", "listen_port": "%s", "dns": "%s" }, "peer": { "public_key": "%s", "psk_key": "%s", "endpoint": "%s", "allowed_ips": "%s" } }, "timestamp": %d }\n' "$CLIENT_NAME" "$address" "$priv_key" "$listen_port" "$dns" "$pub_key" "$psk_key" "$endpoint" "$allowed_ips" "$timestamp"
 }
 
-while getopts ":vha:r:g:j:" option; do
+GetClientList()
+{
+	if [[ $FORMAT = "JSON" ]]; then
+		GetClientListJSON
+	else
+		printf 'Client\tIP Address\n'
+		for d in $CONF_DIR/* ; do
+			CLIENT_NAME=$(echo $d | awk -F"$CONF_DIR/" '{print $2}')
+			CLIENT_DIR=${CONF_DIR}/${CLIENT_NAME}
+			CLIENT_CFG=$CLIENT_DIR/${CLIENT_NAME}.conf
+			address=$(cat $CLIENT_CFG | awk -F"=" '/Address/ {print $2}' | awk '{$1=$1};1')
+			printf '%s\t%s\n' "$CLIENT_NAME" "$address"
+		done
+	fi
+}
+
+GetClientListJSON()
+{
+	clientArr=()
+	for d in $CONF_DIR/* ; do
+		CLIENT_NAME=$(echo $d | awk -F"$CONF_DIR/" '{print $2}')
+		CLIENT_DIR=${CONF_DIR}/${CLIENT_NAME}
+		CLIENT_CFG=$CLIENT_DIR/${CLIENT_NAME}.conf
+		address=$(cat $CLIENT_CFG | awk -F"=" '/Address/ {print $2}' | awk '{$1=$1};1')
+		clientArr+=("{ \"client\": \"$CLIENT_NAME\", \"address\": \"$address\" }") # Will left with a trailing comma
+	done
+	joined=$(printf '%s, ' "${clientArr[@]}" | sed 's/.$//g' | sed 's/.$//g')
+	printf '{ "clients": [ %s ] }\n' "${joined}"
+}
+
+while getopts ":vhjla:r:g:" option; do
    case $option in
       v) # display current version
         echo "WireGuard Client Manager ver ${VER}"
@@ -233,6 +271,8 @@ while getopts ":vha:r:g:j:" option; do
       h) # display Help
         Help
         exit;;
+      j) # JSON format
+		FORMAT=JSON;;
       a) # Add Client
 		CLIENT_NAME=${OPTARG}
 		CLIENT_DIR=${CONF_DIR}/${CLIENT_NAME}
@@ -248,10 +288,8 @@ while getopts ":vha:r:g:j:" option; do
 		CLIENT_DIR=${CONF_DIR}/${CLIENT_NAME}
 		GetClient
 		exit;;
-      j) # Get Client in JSON
-		CLIENT_NAME=${OPTARG}
-		CLIENT_DIR=${CONF_DIR}/${CLIENT_NAME}
-		GetClientJSON
+      l) # Get Client List
+		GetClientList
 		exit;;
      \?) # Invalid option
         echo "Error: Invalid option"
