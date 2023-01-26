@@ -62,14 +62,14 @@ RemoveFromConf()
 	fi
 
 	# Get client ip
-	CLIENT_IP=$(sed -n "/$CLIENT_NAME/p" $IPS_USED | awk '{print $2}')
+	CLIENT_IP=$(sed -n "/$CLIENT_NAME /p" $IPS_USED | awk '{print $2}')
 	
 	# Create backup and Remove from conf
 	sed -i.bak "/# ${CLIENT_NAME} START/,/# ${CLIENT_NAME} END/d" $WG_CONF
 	sed -i.bak -r '/^\s*$/d' $WG_CONF
 	
 	# Create backup and Remove used ips conf
-	sed -i.bak "/${CLIENT_NAME}/d" $IPS_USED
+	sed -i.bak "/${CLIENT_NAME} /d" $IPS_USED
 	sed -i.bak -r '/^\s*$/d' $IPS_USED
 	
 	# Remove routes
@@ -241,6 +241,9 @@ GetClientList()
 		printf 'Client\tIP Address\n'
 		for d in $CONF_DIR/* ; do
 			CLIENT_NAME=$(echo $d | awk -F"$CONF_DIR/" '{print $2}')
+			if [[ $CLIENT_NAME = "*" ]]; then
+				break
+			fi
 			CLIENT_DIR=${CONF_DIR}/${CLIENT_NAME}
 			CLIENT_CFG=$CLIENT_DIR/${CLIENT_NAME}.conf
 			address=$(cat $CLIENT_CFG | awk -F"=" '/Address/ {print $2}' | awk '{$1=$1};1')
@@ -254,6 +257,9 @@ GetClientListJSON()
 	clientArr=()
 	for d in $CONF_DIR/* ; do
 		CLIENT_NAME=$(echo $d | awk -F"$CONF_DIR/" '{print $2}')
+		if [[ $CLIENT_NAME = "*" ]]; then
+			break
+		fi
 		CLIENT_DIR=${CONF_DIR}/${CLIENT_NAME}
 		CLIENT_CFG=$CLIENT_DIR/${CLIENT_NAME}.conf
 		address=$(cat $CLIENT_CFG | awk -F"=" '/Address/ {print $2}' | awk '{$1=$1};1')
