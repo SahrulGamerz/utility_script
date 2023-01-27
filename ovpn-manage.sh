@@ -88,6 +88,10 @@ expect {
 	-re "Confirm request details:" {send -- "yes\r"}
 	-re "Enter pass phrase for /etc/openvpn/pki/private/ca.key:" {send -- "$CERTPASS\r"}
 }
+expect { 
+	-re "Confirm request details:" {send -- "yes\r"}
+	-re "Enter pass phrase for /etc/openvpn/pki/private/ca.key:" {send -- "$CERTPASS\r"}
+}
 expect "Enter pass phrase for /etc/openvpn/pki/private/ca.key:"
 send "$CERTPASS\r"
 interact
