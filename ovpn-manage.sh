@@ -84,6 +84,10 @@ AddClient()
 	esac
 	/usr/bin/expect <(cat << EOF
 spawn easyrsa build-client-full $CLIENT_NAME nopass
+expect { 
+	-re "Confirm request details:" {send -- "yes\r"}
+	-re "Enter pass phrase for /etc/openvpn/pki/private/ca.key:" {send -- "$CERTPASS\r"}
+}
 expect "Enter pass phrase for /etc/openvpn/pki/private/ca.key:"
 send "$CERTPASS\r"
 interact
@@ -114,7 +118,7 @@ GetClient()
 	if [[ $FORMAT = "JSON" ]]; then
 		GetClientJSON
 	else
-		echo $(cat $CLIENT_NAME.ovpn | base64)
+		echo $(base64 $CLIENT_NAME.ovpn)
 	fi
 	rm $CLIENT_NAME.ovpn
 }
@@ -122,7 +126,7 @@ GetClient()
 GetClientJSON()
 {
 	CheckClient
-	printf '{ "client": "%s" }\n' "$(cat $CLIENT_NAME.ovpn | base64)"
+	printf '{ "client": "%s" }\n' "$(base64 $CLIENT_NAME.ovpn)"
 }
 
 GetClientList()
