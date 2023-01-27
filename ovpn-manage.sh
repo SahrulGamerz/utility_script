@@ -110,6 +110,8 @@ expect "Enter pass phrase for /etc/openvpn/pki/private/ca.key:"
 send "$CERTPASS\r"
 expect "Enter pass phrase for /etc/openvpn/pki/private/ca.key:"
 send "$CERTPASS\r"
+expect "Enter pass phrase for /etc/openvpn/pki/private/ca.key:"
+send "$CERTPASS\r"
 interact
 EOF
 )
