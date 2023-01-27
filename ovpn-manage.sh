@@ -140,7 +140,7 @@ GetOVPNStatus()
 	/usr/bin/expect <(cat << EOF
 spawn telnet localhost $MANAGEMENT_PORT
 expect ">INFO:OpenVPN Management Interface Version 3 -- type 'help' for more info"
-send "status\r"
+send "status 3\r"
 expect "END"
 send "exit\r"
 interact
