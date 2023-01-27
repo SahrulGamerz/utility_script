@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VER="0.0.1"
-DESC="This script can be used with linuxserver/wireguard images."
+DESC="This script can be used with linuxserver/wireguard docker images."
 IPS_USED=${IPS_USED:-./config/ips.txt} # If env not set use default
 CONF_DIR=${CONF_DIR:-./config/clients} # If env not set use default
 SERVER_CONF_DIR=${SERVER_CONF_DIR:-./config/server} # If env not set use default
