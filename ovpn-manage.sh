@@ -15,18 +15,6 @@ if ! command -v expect &> /dev/null; then
 	fi
 fi
 
-# Check telnet is installed
-if ! command -v telnet &> /dev/null; then
-    echo "inetutils-telnet could not be found, installing..."
-	if command -v apk &> /dev/null
-	then
-		apk add --no-cache inetutils-telnet
-	else
-		echo "failed to install"
-		exit
-	fi
-fi
-
 if [[ $MANAGEMENT_PORT = "" ]]; then
 	echo "MANAGEMENT_PORT env is empty or not set"
 	exit
@@ -145,32 +133,6 @@ GetClientListJSON()
 	ovpn_listclients
 }
 
-GetOVPNStatus()
-{
-	/usr/bin/expect <(cat << EOF
-spawn telnet localhost $MANAGEMENT_PORT
-expect ">INFO:OpenVPN Management Interface Version 3 -- type 'help' for more info"
-send "status 3\r"
-expect "END"
-send "exit\r"
-interact
-EOF
-)
-}
-
-GetOVPNLoad()
-{
-	/usr/bin/expect <(cat << EOF
-spawn telnet localhost $MANAGEMENT_PORT
-expect ">INFO:OpenVPN Management Interface Version 3 -- type 'help' for more info"
-send "load-stats\r"
-expect "SUCCESS"
-send "exit\r"
-interact
-EOF
-)
-}
-
 while getopts ":vhjlosa:r:g:" option; do
    case $option in
       v) # display current version
@@ -198,12 +160,6 @@ while getopts ":vhjlosa:r:g:" option; do
 		exit;;
       l) # Get Client List
 		GetClientList
-		exit;;
-      s) # Get OpenVPN Status
-		GetOVPNStatus
-		exit;;
-      o) # Get OpenVPN Load Status
-		GetOVPNLoad
 		exit;;
      \?) # Invalid option
         echo "Error: Invalid option"
