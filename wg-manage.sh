@@ -269,6 +269,15 @@ GetClientListJSON()
 	printf '{ "clients": [ %s ] }\n' "${joined}"
 }
 
+CheckCreateReturnClient()
+{
+	if [ ! -d "$CLIENT_DIR" ]; then
+		AddClient
+	fi
+	
+	GetClient
+}
+
 while getopts ":vhjla:r:g:" option; do
    case $option in
       v) # display current version
@@ -288,6 +297,11 @@ while getopts ":vhjla:r:g:" option; do
 		CLIENT_NAME=${OPTARG}
 		CLIENT_DIR=${CONF_DIR}/${CLIENT_NAME}
 		RemoveClient
+		exit;;
+      c) # Check Create Return Client
+		CLIENT_NAME=${OPTARG}
+		CLIENT_DIR=${CONF_DIR}/${CLIENT_NAME}
+		CheckCreateReturnClient
 		exit;;
       g) # Get Client
 		CLIENT_NAME=${OPTARG}
