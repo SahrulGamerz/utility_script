@@ -1,6 +1,8 @@
 #!/bin/bash
 
-VER="0.0.1"
+echo "OpenVPN Client Manager	Copyright (c) 2023-2023 YewonKim (Sah)   20 Mar 2023"
+
+VER="0.0.2"
 DESC="This script can be used with nuBacuk/docker-openvpn docker images."
 
 # Check expect is installed
@@ -26,7 +28,7 @@ Help()
    echo "$DESC"
    echo "Available Command in OpenVPN Client Manager."
    echo
-   echo "Syntax: ovpn-manage [-h|v|j|s|o|l|a <client_name>|r <client_name>|g <client_name>]"
+   echo "Syntax: ovpn-manage [-h|v|j|s|o|l|a <client_name>|r <client_name>|g <client_name>|c <client_name>]"
    echo "Example: ovpn-manage -a MyClient"
    echo "Example: ovpn-manage -r MyClient"
    echo "Example: ovpn-manage -jg MyClient"
@@ -39,6 +41,7 @@ Help()
    echo "j     Get output in JSON format. Only applied to -g -l"
    echo "s     Get OpenVPN status."
    echo "o     Get OpenVPN load status."
+   echo "c	   Check for client existence, create if not exist, return if exist or after create"
    echo "h     Print this Help."
    echo "v     Print software version and exit."
    echo
@@ -122,12 +125,12 @@ GetClientJSON()
 	CheckClient
 	printf '{ "client": "%s" }\n' "$(base64 $CLIENT_NAME.ovpn)"
 }
-
+# TODO
 GetClientList()
 {
 	ovpn_listclients
 }
-
+# TODO
 GetClientListJSON()
 {
 	ovpn_listclients
@@ -142,7 +145,7 @@ CheckCreateReturnClient()
 	GetClient
 }
 
-while getopts ":vhjlosa:r:g:" option; do
+while getopts ":vhjlosa:r:g:c:" option; do
    case $option in
       v) # display current version
         echo "OpenVPN Client Manager ver ${VER}"

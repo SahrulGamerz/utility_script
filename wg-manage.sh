@@ -1,7 +1,10 @@
 #!/bin/bash
 
-VER="0.0.1"
+echo "WireGuard Client Manager	Copyright (c) 2023-2023 YewonKim (Sah)   20 Mar 2023"
+
+VER="0.0.2"
 DESC="This script can be used with linuxserver/wireguard docker images."
+
 IPS_USED=${IPS_USED:-./config/ips.txt} # If env not set use default
 CONF_DIR=${CONF_DIR:-./config/clients} # If env not set use default
 SERVER_CONF_DIR=${SERVER_CONF_DIR:-./config/server} # If env not set use default
@@ -37,7 +40,7 @@ Help()
    echo "$DESC"
    echo "Available Command in WireGuard Client Manager."
    echo
-   echo "Syntax: wg-manage [-h|v|j|l|a <client_name>|r <client_name>|g <client_name>]"
+   echo "Syntax: wg-manage [-h|v|j|l|a <client_name>|r <client_name>|g <client_name>|c <client_name>]"
    echo "Example: wg-manage -a MyClient"
    echo "Example: wg-manage -r MyClient"
    echo "Example: wg-manage -jg MyClient"
@@ -48,6 +51,7 @@ Help()
    echo "g     Get client."
    echo "l     Get client list."
    echo "j     Get output in JSON format. Only applied to -g -l"
+   echo "c	   Check for client existence, create if not exist, return if exist or after create"
    echo "h     Print this Help."
    echo "v     Print software version and exit."
    echo
@@ -278,7 +282,7 @@ CheckCreateReturnClient()
 	GetClient
 }
 
-while getopts ":vhjla:r:g:" option; do
+while getopts ":vhjla:r:g:c:" option; do
    case $option in
       v) # display current version
         echo "WireGuard Client Manager ver ${VER}"
