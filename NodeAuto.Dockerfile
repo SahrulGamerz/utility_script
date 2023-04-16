@@ -7,6 +7,7 @@ RUN addgroup app && adduser -D -S -G app app
 ENV PORT=3000 
 ENV RUN_SCRIPT=start 
 ENV GIT_BRANCH=main
+ENV HEALTHCHECK_URL=http://localhost:3000/health
 
 RUN echo "#!/bin/sh" > /start.sh && echo "[ -d \"/app/.git\" ] && echo Running git pull $""GIT_URL || echo Running git clone -b $""GIT_BRANCH $""GIT_URL ." >> /start.sh && echo "[ -d \"/app/.git\" ] && git pull $""GIT_URL || git clone -b $""GIT_BRANCH $""GIT_URL ." >> /start.sh && echo "echo Running npm install" >> /start.sh && echo "npm install" >> /start.sh && echo "echo Running npm run $""RUN_SCRIPT" >> /start.sh && echo "npm run $""RUN_SCRIPT" >> /start.sh 
 
@@ -17,6 +18,6 @@ USER app
 
 EXPOSE $PORT 
 
-HEALTHCHECK CMD curl -fs http://localhost:3000 || exit 1     
+HEALTHCHECK CMD curl -fs $HEALTHCHECK_URL || exit 1     
 
 CMD ["/start.sh"] 
