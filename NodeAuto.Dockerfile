@@ -1,6 +1,6 @@
 FROM node:lts-alpine
 
-RUN apk add --no-cache curl git ca-certificates && update-ca-certificates 
+RUN apk add --no-cache curl git ca-certificates openssl && update-ca-certificates 
  	
 RUN addgroup app && adduser -D -S -G app app 
 	
