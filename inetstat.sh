@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 VER="0.0.1"
 DESC="This script can be used in all linux version. This will output network utilization in JSON format."
